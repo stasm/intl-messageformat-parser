@@ -12,7 +12,19 @@ Apache License, Version 2.0
 */
 
 start
-    = messageFormatPattern
+    = pairs:(keyValuePair '\n'?)* {
+        return pairs.reduce(
+            (seq, cur) => Object.assign(seq, cur[0]),
+            Object.create(null)
+        );
+    }
+
+keyValuePair
+    = key:chars _ '=' _ value:messageFormatPattern {
+        return {
+            [key]: value
+        };
+    }
 
 messageFormatPattern
     = elements:messageFormatElement* {
@@ -135,7 +147,7 @@ pluralStyle
 
 // -- Helpers ------------------------------------------------------------------
 
-ws 'whitespace' = [ \t\n\r]+
+ws 'whitespace' = [ \t]+
 _ 'optionalWhitespace' = $(ws*)
 
 digit    = [0-9]
@@ -146,7 +158,7 @@ number = digits:('0' / $([1-9] digit*)) {
 }
 
 char
-    = [^{}\\\0-\x1F\x7f \t\n\r]
+    = [^={}\\\0-\x1F\x7f \t\n\r]
     / '\\\\' { return '\\'; }
     / '\\#'  { return '\\#'; }
     / '\\{'  { return '\u007B'; }
