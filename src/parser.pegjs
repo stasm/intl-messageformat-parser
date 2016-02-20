@@ -119,11 +119,10 @@ selectFormat
     }
 
 selector
-    = $('=' number)
-    / chars
+    = '[' _ chars:chars _ ']' { return chars; }
 
 optionalFormatPattern
-    = _ selector:selector _ '{' _ pattern:messageFormatPattern _ '}' {
+    = _ selector:selector _ pattern:messageFormatPattern {
         return {
             type    : 'optionalFormatPattern',
             selector: selector,
@@ -158,7 +157,7 @@ number = digits:('0' / $([1-9] digit*)) {
 }
 
 char
-    = [^={}\\\0-\x1F\x7f \t\n\r]
+    = [^=\[\]{}\\\0-\x1F\x7f \t\n\r]
     / '\\\\' { return '\\'; }
     / '\\#'  { return '\\#'; }
     / '\\{'  { return '\u007B'; }
