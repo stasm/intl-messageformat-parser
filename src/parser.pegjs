@@ -125,10 +125,11 @@ selector
     = '[' _ chars:chars _ ']' { return chars; }
 
 optionalFormatPattern
-    = _ selector:selector _ pattern:messageFormatPattern {
+    = _ def:'*'? selector:selector _ pattern:messageFormatPattern {
         return {
             type    : 'optionalFormatPattern',
             selector: selector,
+            default: !!def,
             value   : pattern
         };
     }
