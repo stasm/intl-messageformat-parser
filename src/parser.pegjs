@@ -65,10 +65,20 @@ messageTextElement
 
 argument
     = number
-    / $([^ \t\n\r,.+={}#]+)
+    / callExpression
+    / identifier
+
+callExpression
+    = callee:builtin '(' _ arg:argument? _ ')' {
+        return {
+            type: 'callExpression',
+            callee: callee,
+            arg: arg,
+        };
+    }
 
 argumentElement
-    = '{' _ id:argument _ format:(',' _ elementFormat)? _ '}' {
+    = '{' _ id:argument _ format:('->' _ selectFormat)? _ '}' {
         return {
             type  : 'argumentElement',
             id    : id,
@@ -76,42 +86,8 @@ argumentElement
         };
     }
 
-elementFormat
-    = simpleFormat
-    / pluralFormat
-    / selectOrdinalFormat
-    / selectFormat
-
-simpleFormat
-    = type:('number' / 'date' / 'time') _ style:(',' _ chars)? {
-        return {
-            type : type + 'Format',
-            style: style && style[2]
-        };
-    }
-
-pluralFormat
-    = 'plural' _ ',' _ pluralStyle:pluralStyle {
-        return {
-            type   : pluralStyle.type,
-            ordinal: false,
-            offset : pluralStyle.offset || 0,
-            options: pluralStyle.options
-        };
-    }
-
-selectOrdinalFormat
-    = 'selectordinal' _ ',' _ pluralStyle:pluralStyle {
-        return {
-            type   : pluralStyle.type,
-            ordinal: true,
-            offset : pluralStyle.offset || 0,
-            options: pluralStyle.options
-        }
-    }
-
 selectFormat
-    = 'select' _ ',' _ options:optionalFormatPattern+ {
+    = options:optionalFormatPattern+ {
         return {
             type   : 'selectFormat',
             options: options
@@ -127,20 +103,6 @@ optionalFormatPattern
             type    : 'optionalFormatPattern',
             selector: selector,
             value   : pattern
-        };
-    }
-
-offset
-    = 'offset:' _ number:number {
-        return number;
-    }
-
-pluralStyle
-    = offset:offset? _ options:optionalFormatPattern+ {
-        return {
-            type   : 'pluralFormat',
-            offset : offset,
-            options: options
         };
     }
 
@@ -167,3 +129,6 @@ char
     }
 
 chars = chars:char+ { return chars.join(''); }
+
+identifier = $([a-zA-Z0-9_?-]+)
+builtin    = $([A-Z0-9_?-]+)
