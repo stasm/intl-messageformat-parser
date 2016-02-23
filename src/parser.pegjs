@@ -20,7 +20,7 @@ start
     }
 
 keyValuePair
-    = key:chars _ '=' _ value:messageFormatPattern {
+    = key:chars __ '=' __ value:messageFormatPattern {
         return {
             [key]: value
         };
@@ -39,7 +39,7 @@ messageFormatElement
     / argumentElement
 
 messageText
-    = text:(_ chars _)+ {
+    = text:(__ chars __)+ {
         var string = '',
             i, j, outerLen, inner, innerLen;
 
@@ -53,7 +53,7 @@ messageText
 
         return string;
     }
-    / $(ws)
+    / $(nbws)
 
 messageTextElement
     = messageText:messageText {
@@ -108,7 +108,10 @@ optionalFormatPattern
 
 // -- Helpers ------------------------------------------------------------------
 
-ws 'whitespace' = [ \t]+
+
+nbws 'non-breaking whitespace' = [ \t]+
+__ 'optionalNonBreakingWhitespace' = $(nbws*)
+ws 'whitespace' = [ \t\n\r]+
 _ 'optionalWhitespace' = $(ws*)
 
 digit    = [0-9]
