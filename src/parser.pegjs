@@ -63,13 +63,40 @@ messageTextElement
         };
     }
 
-argument
-    = number
+expression
+    = literal
     / callExpression
-    / identifier
+    / argumentReference
+    / messageReference
+
+literal
+    = number:number {
+        return {
+            type: 'literalElement',
+            value: number,
+        }
+    }
+
+messageReference
+    = id:identifier {
+         return {
+              type: 'messageReference',
+              id: id
+         }
+    }
+
+argumentReference
+    = '$' id:identifier {
+         return {
+              type: 'argumentReference',
+              id: id
+         }
+    }
+
+
 
 callExpression
-    = callee:builtin '(' _ arg:argument? _ ')' {
+    = callee:builtin '(' _ arg:expression? _ ')' {
         return {
             type: 'callExpression',
             callee: callee,
@@ -78,7 +105,7 @@ callExpression
     }
 
 argumentElement
-    = '{' _ id:argument _ format:('->' _ selectFormat)? _ '}' {
+    = '{' _ id:expression _ format:('->' _ selectFormat)? _ '}' {
         return {
             type  : 'argumentElement',
             id    : id,
