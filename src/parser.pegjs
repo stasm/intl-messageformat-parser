@@ -168,5 +168,5 @@ char
 
 chars = chars:char+ { return chars.join(''); }
 
-identifier = $([a-zA-Z0-9_?-]+)
+identifier = $([a-zA-Z0-9_?:-]+)
 builtin    = $([A-Z0-9_?-]+)
