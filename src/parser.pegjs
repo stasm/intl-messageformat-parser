@@ -12,7 +12,7 @@ Apache License, Version 2.0
 */
 
 start
-    = pairs:(keyValuePair '\n'?)* {
+    = pairs:(keyValuePair '\n'*)* {
         return pairs.reduce(
             (seq, cur) => Object.assign(seq, cur[0]),
             Object.create(null)
@@ -98,7 +98,7 @@ callExpression
     }
 
 placeableElement
-    = '{' _ expr:expression '}' {
+    = '{' _ expr:expression _ '}' {
         return {
             type    : 'placeableElement',
             expr    : expr,
