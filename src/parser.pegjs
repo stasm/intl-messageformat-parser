@@ -98,11 +98,23 @@ callExpression
     }
 
 placeableElement
-    = '{' _ expr:expression _ variants:('->' _ variant+)? _ '}' {
+    = '{' _ expr:expression '}' {
         return {
             type    : 'placeableElement',
             expr    : expr,
-            variants: variants && variants[2],
+        };
+    }
+    / '{' _ variants:(variant+) _ '}' {
+        return {
+            type    : 'placeableElement',
+            variants: variants,
+        };
+    }
+    / '{' _ expr:expression _ variants:('->' _ variant+) _ '}' {
+        return {
+            type    : 'placeableElement',
+            expr    : expr,
+            variants: variants[2],
         };
     }
 
