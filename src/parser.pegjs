@@ -20,25 +20,20 @@ start
     }
 
 keyValuePair
-    = key:chars __ '=' __ value:messageFormatPattern {
+    = key:chars __ '=' __ value:valueElements {
         return {
             [key]: value
         };
     }
 
-messageFormatPattern
-    = elements:messageFormatElement* {
-        return {
-            type    : 'messageFormatPattern',
-            elements: elements
-        };
-    }
+valueElements
+    = valueElement*
 
-messageFormatElement
-    = messageTextElement
-    / argumentElement
+valueElement
+    = textElement
+    / placeableElement
 
-messageText
+text
     = text:(__ chars __)+ {
         var string = '',
             i, j, outerLen, inner, innerLen;
@@ -55,79 +50,68 @@ messageText
     }
     / $(nbws)
 
-messageTextElement
-    = messageText:messageText {
+textElement
+    = text:text {
         return {
-            type : 'messageTextElement',
-            value: messageText
+            type : 'textElement',
+            value: text
         };
     }
 
 expression
-    = literal
+    = literalExpression
     / callExpression
-    / argumentReference
-    / messageReference
+    / argumentExpression
+    / messageExpression
 
-literal
+literalExpression
     = number:number {
         return {
-            type: 'literalElement',
+            type: 'literalExpression',
             value: number,
         }
     }
 
-messageReference
+messageExpression
     = id:identifier {
          return {
-              type: 'messageReference',
+              type: 'messageExpression',
               id: id
          }
     }
 
-argumentReference
+argumentExpression
     = '$' id:identifier {
          return {
-              type: 'argumentReference',
+              type: 'argumentExpresion',
               id: id
          }
     }
 
-
-
 callExpression
-    = callee:builtin '(' _ arg:expression? _ ')' {
+    = callee:builtin '(' _ arg:expression _ ')' {
         return {
             type: 'callExpression',
             callee: callee,
-            arg: arg,
+            args: [arg],
         };
     }
 
-argumentElement
-    = '{' _ id:expression _ format:('->' _ selectFormat)? _ '}' {
+placeableElement
+    = '{' _ expr:expression _ variants:('->' _ variant+)? _ '}' {
         return {
-            type  : 'argumentElement',
-            id    : id,
-            format: format && format[2]
-        };
-    }
-
-selectFormat
-    = options:optionalFormatPattern+ {
-        return {
-            type   : 'selectFormat',
-            options: options
+            type    : 'placeableElement',
+            expr    : expr,
+            variants: variants && variants[2],
         };
     }
 
 selector
     = '[' _ chars:chars _ ']' { return chars; }
 
-optionalFormatPattern
-    = _ def:'*'? selector:selector _ pattern:messageFormatPattern {
+variant
+    = _ def:'*'? selector:selector _ pattern:valueElements {
         return {
-            type    : 'optionalFormatPattern',
             selector: selector,
             default: !!def,
             value   : pattern
