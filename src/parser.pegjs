@@ -68,7 +68,7 @@ literalExpression
     = number:number {
         return {
             type: 'literalExpression',
-            value: number,
+            value: parseInt(number),
         }
     }
 
@@ -83,7 +83,7 @@ messageExpression
 argumentExpression
     = '$' id:identifier {
          return {
-              type: 'argumentExpresion',
+              type: 'argumentExpression',
               id: id
          }
     }
@@ -119,7 +119,8 @@ placeableElement
     }
 
 selector
-    = '[' _ chars:chars _ ']' { return chars; }
+    = '[' _ sel:number _ ']' { return parseInt(sel); }
+    / '[' _ sel:identifier _ ']' { return sel; }
 
 variant
     = _ def:'*'? selector:selector _ pattern:valueElements {
