@@ -61,6 +61,7 @@ textElement
 expression
     = literalExpression
     / callExpression
+    / memberExpression
     / argumentExpression
     / messageExpression
 
@@ -94,6 +95,15 @@ callExpression
             type: 'callExpression',
             callee: callee,
             args: [arg],
+        };
+    }
+
+memberExpression
+    = object:identifier '[' _ property:identifier _ ']' {
+        return {
+            type: 'memberExpression',
+            object: object,
+            property: property,
         };
     }
 
