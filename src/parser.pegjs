@@ -48,7 +48,6 @@ text
 
         return string;
     }
-    / $(nbws)
 
 textElement
     = text:text {
@@ -90,7 +89,7 @@ argumentExpression
     }
 
 callExpression
-    = callee:builtin '(' _ arg:expression _ ')' {
+    = callee:builtin '(' __ arg:expression __ ')' {
         return {
             type: 'callExpression',
             callee: callee,
@@ -99,7 +98,7 @@ callExpression
     }
 
 memberExpression
-    = object:identifier '[' _ property:identifier _ ']' {
+    = object:identifier '[' __ property:identifier __ ']' {
         return {
             type: 'memberExpression',
             object: object,
@@ -108,19 +107,19 @@ memberExpression
     }
 
 placeableElement
-    = '{' _ expr:expression _ '}' {
+    = '{' _n expr:expression _n '}' {
         return {
             type    : 'placeableElement',
             expr    : expr,
         };
     }
-    / '{' _ variants:(variant+) _ '}' {
+    / '{' _n variants:(variant+) _n '}' {
         return {
             type    : 'placeableElement',
             variants: variants,
         };
     }
-    / '{' _ expr:expression _ variants:('->' _ variant+) _ '}' {
+    / '{' _n expr:expression _n variants:('->' _n variant+) _n '}' {
         return {
             type    : 'placeableElement',
             expr    : expr,
@@ -129,11 +128,11 @@ placeableElement
     }
 
 selector
-    = '[' _ sel:number _ ']' { return parseInt(sel); }
-    / '[' _ sel:identifier _ ']' { return sel; }
+    = '[' __ sel:number __ ']' { return parseInt(sel); }
+    / '[' __ sel:identifier __ ']' { return sel; }
 
 variant
-    = _ def:'*'? selector:selector _ pattern:valueElements {
+    = _n def:'*'? selector:selector __ pattern:valueElements {
         return {
             selector: selector,
             default: !!def,
@@ -141,13 +140,11 @@ variant
         };
     }
 
+
 // -- Helpers ------------------------------------------------------------------
 
-
-nbws 'non-breaking whitespace' = [ \t]+
-__ 'optionalNonBreakingWhitespace' = $(nbws*)
-ws 'whitespace' = [ \t\n\r]+
-_ 'optionalWhitespace' = $(ws*)
+__ 'optional single-line whitespace' = $([ \t]*)
+_n 'optionalWhitespace' = $([ \t\n\r]*)
 
 digit    = [0-9]
 hexDigit = [0-9a-f]i
